@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from todoapp.models import Todo
 from django.contrib import messages
+from todoapp.decorators import signin_required
+from django.utils.decorators import method_decorator
 
 
 # Create your views here.
@@ -63,6 +65,7 @@ class LoginView(View):
         return render(request, 'login.html')
 
 
+@method_decorator(signin_required,name="dispatch")
 class IndexView(TemplateView):
     template_name = "home.html"
 
@@ -73,13 +76,14 @@ class IndexView(TemplateView):
     # def get(self,request,*args,**kwargs):
     #     return render(request,'home.html')
 
-
+@method_decorator(signin_required,name="dispatch")
 class SignOutView(View):
     def get(self, request, *args, **kwargs):
+        print(request.user.is_authenticated)
         logout(request)
         return redirect("signin")
 
-
+@method_decorator(signin_required,name="dispatch")
 class TodoAddView(CreateView):
     model = Todo
     form_class = forms.TodoForm
@@ -106,7 +110,7 @@ class TodoAddView(CreateView):
     #         messages.error(request, "Failed to Add Todo")
     #         return render(request, "add-todo.html", {"form": form})
 
-
+@method_decorator(signin_required,name="dispatch")
 class TodoListView(ListView):
     model = Todo
     context_object_name = "todos"
@@ -121,13 +125,15 @@ class TodoListView(ListView):
 
 
 # localhost:8000/todos/remove/<int:id>
+@signin_required
 def delete_todo(request, *args, **kwargs):
+    print(request.user.is_authenticated)
     id = kwargs.get("id")
     Todo.objects.get(id=id).delete()
     messages.success(request, "Todo has been deleted")
     return redirect("todos-list")
 
-
+@method_decorator(signin_required,name="dispatch")
 class TodoDetailView(DetailView):
     model = Todo
     context_object_name = "todo"
@@ -139,7 +145,7 @@ class TodoDetailView(DetailView):
     #     todo = Todo.objects.get(id=id)
     #     return render(request, "todo-detail.html", {"todo": todo})
 
-
+@method_decorator(signin_required,name="dispatch")
 class TodoEditView(UpdateView):
     model = Todo
     form_class = forms.TodoChangeForm

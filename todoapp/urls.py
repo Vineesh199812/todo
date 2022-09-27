@@ -11,5 +11,4 @@ urlpatterns=[
     path("todos/remove/<int:id>",views.delete_todo,name="remove-todo"),
     path("todos/details/<int:id>",views.TodoDetailView.as_view(),name="todo-detail"),
     path("todos/change/<int:id>",views.TodoEditView.as_view(),name="edit-todo"),
-
 ]
